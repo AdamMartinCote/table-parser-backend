@@ -1,0 +1,47 @@
+org: adammartincote
+app: table-parser-backend
+service: table-parser-backend
+frameworkVersion: '2 || 3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: '20201221'
+  httpApi:
+    cors: true
+  iam:
+    role:
+      name: custom-lambda-role
+      path: /custom-lambda-role/
+      statements:
+        - Effect: "Allow"
+          Resource: "*"
+          Action: "textract:AnalyzeDocument"
+
+functions:
+  analyze:
+    handler: handler.analyze_picture
+    events:
+      - httpApi:
+          path: /
+          method: post
+          cors:
+            allowedOrigins:
+              - "*"
+              - "http://localhost:5000"
+            allowedMethods:
+              - GET
+              - POST
+              - OPTIONS
+            allowedHeaders:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - X-Transaction-Key
+              - Access-Control-Allow-Origin
+
+plugins:
+  - serverless-python-requirements
